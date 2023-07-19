@@ -14,7 +14,7 @@ import AddPlacePopup from './AddPlacePopup.js';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute.js';
 import ProtectedHomepage from './ProtectedHomepage';
-import { registration, authorization } from '../utils/auth.js';
+import { registration, authorization, getUserData } from '../utils/auth.js';
 import InfoToolTip from './InfoTooltip.js';
 
 
@@ -80,35 +80,22 @@ function App() {
     }
   }, [isOpen, closeAllPopups])
 
+
   useEffect(() => {
     if (localStorage.jwt) {
-      setUserEmail(window.localStorage.getItem('email'))
-      setLoggedIn(true)
-      setIsCheckToken(false)
-      navigate('/')
+      getUserData(localStorage.jwt)
+      .then(() => {
+        setLoggedIn(true)
+        setUserEmail(window.localStorage.getItem('email'))
+        setIsCheckToken(false)
+      })
+      .catch((error => console.error(`Ошибка при загрузке ${error}`)))
     } else {
       setLoggedIn(false)
       setIsCheckToken(false)
     }
-  }, [navigate])
+  }, [])
   
-
-
-  // useEffect(() => {
-  //   if (localStorage.jwt) {
-  //     getUserData(localStorage.jwt)
-  //     .then(() => {
-  //       setLoggedIn(true)
-  //       setIsCheckToken(false)
-  //       navigate('/')
-  //     })
-  //     .catch((error => console.error(`Ошибка при загрузке ${error}`)))
-  //   } else {
-  //     setLoggedIn(false)
-  //     setIsCheckToken(false)
-  //   }
-  // }, [navigate])
-
   function handleEditClick () {
     setEditPopupOpen(true);
   }
@@ -214,7 +201,7 @@ function App() {
         console.error(`Ошибка при регистрации ${error}`);
       })
       .finally(() => {
-        setUserEmail(email)
+        setUserEmail(email);
         setIsSending(false)})
   }
 
@@ -246,6 +233,7 @@ function App() {
           onAvatar={handleAvatarClick}
           onDelete={handleDeleteClick}
           onImageClick={handleImageClick}
+          setLoggedIn={setLoggedIn}
           cards={cards}
           isLoading={isLoading}
           userEmail={userEmail}
@@ -259,6 +247,7 @@ function App() {
             </>
           }/>
           <Route path='/sign-in' element={
+            loggedIn ? <Navigate to='/' replace/> :
             <>
               <Header name='signin'/>
               <Main name='signin' isCheckToken={isCheckToken} handleSignIn={handleSignIn}/>

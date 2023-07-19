@@ -2,10 +2,11 @@ import React from 'react';
 import logo from '../images/header-logo.svg';
 import { Link } from 'react-router-dom';
 
-function Header({name, userEmail}) {
+function Header({name, userEmail, setLoggedIn}) {
   function onLogOut() {
     localStorage.removeItem('jwt');
     localStorage.removeItem('email')
+    setLoggedIn(false)
   }
   return (
     <header className="header">

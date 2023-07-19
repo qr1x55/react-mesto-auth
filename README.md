@@ -4,7 +4,7 @@
 
 ## Demo
 
-Github Pages: https://qr1x55.github.io/mesto-react-auth/
+Github Pages: https://qr1x55.github.io/react-mesto-auth/
 
 **Использованные технологии:**
 
