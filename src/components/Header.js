@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 function Header({name, userEmail}) {
   function onLogOut() {
     localStorage.removeItem('jwt');
+    localStorage.removeItem('email')
   }
   return (
     <header className="header">

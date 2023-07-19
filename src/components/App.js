@@ -14,7 +14,7 @@ import AddPlacePopup from './AddPlacePopup.js';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute.js';
 import ProtectedHomepage from './ProtectedHomepage';
-import { registration, authorization, getUserData } from '../utils/auth.js';
+import { registration, authorization } from '../utils/auth.js';
 import InfoToolTip from './InfoTooltip.js';
 
 
@@ -42,6 +42,7 @@ function App() {
 
   const isOpen = isEditPopupOpen || isAddPopupOpen || isAvatarPopupOpen || isDeletePopupOpen || isImagePopup
 
+
   const navigate = useNavigate(); 
 
   const statesForCloseAllPopups = useCallback (() => {
@@ -57,7 +58,7 @@ function App() {
     statesForCloseAllPopups()
   },[statesForCloseAllPopups])
 
-
+  
   useEffect(() => {
     function closeByEsc(e) {
       if (e.key === 'Escape') {
@@ -81,19 +82,32 @@ function App() {
 
   useEffect(() => {
     if (localStorage.jwt) {
-      getUserData(localStorage.jwt)
-      .then(res => {
-        setUserEmail(res.data.email)
-        setLoggedIn(true)
-        setIsCheckToken(false)
-        navigate('/')
-      })
-      .catch((error => console.error(`Ошибка при загрузке ${error}`)))
+      setUserEmail(window.localStorage.getItem('email'))
+      setLoggedIn(true)
+      setIsCheckToken(false)
+      navigate('/')
     } else {
       setLoggedIn(false)
       setIsCheckToken(false)
     }
   }, [navigate])
+  
+
+
+  // useEffect(() => {
+  //   if (localStorage.jwt) {
+  //     getUserData(localStorage.jwt)
+  //     .then(() => {
+  //       setLoggedIn(true)
+  //       setIsCheckToken(false)
+  //       navigate('/')
+  //     })
+  //     .catch((error => console.error(`Ошибка при загрузке ${error}`)))
+  //   } else {
+  //     setLoggedIn(false)
+  //     setIsCheckToken(false)
+  //   }
+  // }, [navigate])
 
   function handleEditClick () {
     setEditPopupOpen(true);
@@ -189,6 +203,7 @@ function App() {
     authorization(password, email)
       .then(res => {
         localStorage.setItem('jwt', res.token)
+        localStorage.setItem('email', email);
         setLoggedIn(true)
         window.scrollTo(0,0)
         navigate('/')
@@ -198,7 +213,9 @@ function App() {
         setIsSuccess(false)
         console.error(`Ошибка при регистрации ${error}`);
       })
-      .finally(() => setIsSending(false))
+      .finally(() => {
+        setUserEmail(email)
+        setIsSending(false)})
   }
 
   function handleSignUp(password, email) {
@@ -281,7 +298,7 @@ function App() {
         isSending = {isSending}
       /> 
       <ImagePopup 
-        name = 'image'
+        name = 'picture'
         card = {selectedCard} 
         isOpen = {isImagePopup} 
         onClose = {closeAllPopups}
